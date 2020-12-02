@@ -1,20 +1,15 @@
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
 import cx from "classnames";
 import { stripHtml } from "utils/strip-html";
+import { useQuotesManyQuery, Quote, Character } from "generated/apolloHooks";
 
-const QUOTES_MANY_QUERY = gql`
-  query quotesMany {
-    quoteMany(limit: 4) {
-      _id
-      markup
-      characters {
-        _id
-        coverPicture
-      }
-    }
-  }
-`;
+type IQuote = {
+  __typename?: "Quote";
+} & Pick<Quote, "_id" | "markup"> & {
+    characters?: ({
+      __typename?: "Character";
+    } & Pick<Character, "_id" | "coverPicture">)[];
+  };
 
 const Heading = ({ color = "light", children }) => (
   <th
@@ -57,7 +52,13 @@ const TableRow = ({ color = "light", characters, index, markup }) => (
   </tr>
 );
 
-const Table = ({ color = "light", quotes }) => {
+const Table = ({
+  color = "light",
+  quotes,
+}: {
+  color?: string;
+  quotes: IQuote[];
+}) => {
   return (
     <div
       className={
@@ -106,7 +107,7 @@ const Table = ({ color = "light", quotes }) => {
 };
 
 export const QuoteTable = () => {
-  const { data, loading, error } = useQuery(QUOTES_MANY_QUERY);
+  const { data, loading, error } = useQuotesManyQuery();
   const quotes = data?.quoteMany ?? [];
 
   if (loading) return <p>Loading...</p>;

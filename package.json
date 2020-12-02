@@ -1,8 +1,8 @@
 {
-  "name": "notus-react",
+  "name": "quotic-admin",
   "version": "1.0.0",
-  "description": "Notus React - A free Tailwind CSS and React UI Kit and Admin by Creative Tim.",
-  "repository": "https://github.com/creativetimofficial/notus-react",
+  "description": "Qutoic Admin Panel Frontend",
+  "repository": "https://github.com/anku255/quotic-admin",
   "license": "MIT",
   "dependencies": {
     "@apollo/client": "^3.2.9",
@@ -28,7 +28,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm run build:tailwind && npm start",
-    "build:tailwind": "tailwind build src/assets/styles/index.css -o src/assets/styles/tailwind.css"
+    "build:tailwind": "tailwind build src/assets/styles/index.css -o src/assets/styles/tailwind.css",
+    "generate": "graphql-codegen --config codegen.yml"
   },
   "browserslist": {
     "production": [
@@ -52,6 +53,10 @@
     "typescript": "^4.1.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.19.4",
+    "@graphql-codegen/typescript": "^1.19.0",
+    "@graphql-codegen/typescript-operations": "^1.17.12",
+    "@graphql-codegen/typescript-react-apollo": "^2.2.1",
     "@types/classnames": "^2.2.11",
     "@types/react-router-dom": "^5.1.6",
     "eslint-import-resolver-alias": "^1.1.2"
