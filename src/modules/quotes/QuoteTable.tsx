@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import cx from "classnames";
 import { stripHtml } from "utils/strip-html";
 import { useQuotesManyQuery, Quote, Character } from "generated/apolloHooks";
+import { Pagination } from "components/Pagination";
+import { History } from "history";
 
 type IQuote = {
   __typename?: "Quote";
@@ -106,16 +108,45 @@ const Table = ({
   );
 };
 
-export const QuoteTable = () => {
-  const { data, loading, error } = useQuotesManyQuery();
+const parsePageNo = (paramsString: string): number => {
+  const searchParams = new URLSearchParams(paramsString);
+  return +searchParams.get("page") || 1;
+};
+
+const QUOTES_LIMIT = 20;
+
+export const QuoteTable = ({ history }: { history: History }) => {
+  const [currentPage, setCurrentPage] = useState(
+    parsePageNo(history.location.search)
+  );
+
+  const { data, loading, error } = useQuotesManyQuery({
+    variables: { skip: (currentPage - 1) * QUOTES_LIMIT, limit: QUOTES_LIMIT },
+  });
+
   const quotes = data?.quoteMany ?? [];
+  const quotesCount = data?.quoteCount;
 
   if (loading) return <p>Loading...</p>;
+
+  if (error) return <p>{error.message}</p>;
 
   return (
     <div className="flex flex-wrap mt-4">
       <div className="w-full px-4 mb-12">
-        <Table quotes={quotes} />
+        <div className="px-8">
+          <Table quotes={quotes} />
+        </div>
+        <div>
+          <Pagination
+            noOfPages={Math.floor(quotesCount / QUOTES_LIMIT)}
+            currentPage={currentPage}
+            handlePageClick={(nextPage) => {
+              setCurrentPage(nextPage);
+              history.push(`/quotes?page=${nextPage}`);
+            }}
+          />
+        </div>
       </div>
     </div>
   );

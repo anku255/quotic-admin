@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const QUOTES_MANY_QUERY = gql`
-  query quotesMany {
-    quoteMany(limit: 4) {
+  query quotesMany($limit: Int, $skip: Int) {
+    quoteMany(limit: $limit, skip: $skip) {
       _id
       markup
       characters {
@@ -10,5 +10,6 @@ export const QUOTES_MANY_QUERY = gql`
         coverPicture
       }
     }
+    quoteCount
   }
 `;

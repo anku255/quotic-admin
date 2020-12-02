@@ -8,14 +8,14 @@ import "assets/styles/tailwind.css";
 
 // layouts
 
-import Admin from "layouts/Admin";
-import Auth from "layouts/Auth";
+// import Admin from "layouts/Admin";
+// import Auth from "layouts/Auth";
 
 // views without layouts
 
-import Landing from "views/Landing";
-import Profile from "views/Profile";
-import Index from "views/Index";
+// import Landing from "views/Landing";
+// import Profile from "views/Profile";
+// import Index from "views/Index";
 import Quotes from "modules/quotes";
 
 const client = new ApolloClient({
@@ -34,8 +34,8 @@ const App = () => (
         {/* <Route path="/landing" exact component={Landing} />
         <Route path="/profile" exact component={Profile} /> */}
         <Route path="/quotes" exact component={Quotes} />
+        <Redirect from="/" to="/quotes" />
 
-        <Route path="/" exact component={Quotes} />
         {/* add redirect for first page */}
         <Redirect from="*" to="/" />
       </Switch>

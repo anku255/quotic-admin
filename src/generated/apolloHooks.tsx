@@ -1584,11 +1584,15 @@ export type RemoveOneCharacterPayload = {
   record?: Maybe<Character>;
 };
 
-export type QuotesManyQueryVariables = Exact<{ [key: string]: never; }>;
+export type QuotesManyQueryVariables = Exact<{
+  limit?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
+}>;
 
 
 export type QuotesManyQuery = (
   { __typename?: 'Query' }
+  & Pick<Query, 'quoteCount'>
   & { quoteMany?: Maybe<Array<Maybe<(
     { __typename?: 'Quote' }
     & Pick<Quote, '_id' | 'markup'>
@@ -1601,8 +1605,8 @@ export type QuotesManyQuery = (
 
 
 export const QuotesManyDocument = gql`
-    query quotesMany {
-  quoteMany(limit: 4) {
+    query quotesMany($limit: Int, $skip: Int) {
+  quoteMany(limit: $limit, skip: $skip) {
     _id
     markup
     characters {
@@ -1610,6 +1614,7 @@ export const QuotesManyDocument = gql`
       coverPicture
     }
   }
+  quoteCount
 }
     `;
 
@@ -1625,6 +1630,8 @@ export const QuotesManyDocument = gql`
  * @example
  * const { data, loading, error } = useQuotesManyQuery({
  *   variables: {
+ *      limit: // value for 'limit'
+ *      skip: // value for 'skip'
  *   },
  * });
  */
