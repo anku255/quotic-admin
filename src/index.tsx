@@ -17,6 +17,7 @@ import "assets/styles/tailwind.css";
 // import Profile from "views/Profile";
 // import Index from "views/Index";
 import Quotes from "modules/quotes";
+import Characters from "modules/characters";
 
 const client = new ApolloClient({
   uri: "http://localhost:8000/graphql",
@@ -35,6 +36,7 @@ const App = () => (
         <Route path="/profile" exact component={Profile} /> */}
         <Redirect exact from="/" to="/quotes" />
         <Route path="/quotes" component={Quotes} />
+        <Route path="/characters" component={Characters} />
 
         {/* add redirect for first page */}
         <Redirect from="*" to="/" />

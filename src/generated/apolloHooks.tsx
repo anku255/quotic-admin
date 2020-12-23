@@ -1599,6 +1599,61 @@ export type RemoveOneCharacterPayload = {
   record?: Maybe<Character>;
 };
 
+export type CharacterManyQueryVariables = Exact<{
+  limit?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type CharacterManyQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'characterCount'>
+  & { characterMany?: Maybe<Array<Maybe<(
+    { __typename?: 'Character' }
+    & Pick<Character, '_id' | 'characterName' | 'realName' | 'coverPicture'>
+  )>>> }
+);
+
+export type CharacterOneQueryVariables = Exact<{
+  filter?: Maybe<FilterFindOneCharacterInput>;
+}>;
+
+
+export type CharacterOneQuery = (
+  { __typename?: 'Query' }
+  & { characterOne?: Maybe<(
+    { __typename?: 'Character' }
+    & Pick<Character, '_id' | 'characterName' | 'realName' | 'imdbLink' | 'dob' | 'coverPicture' | 'bioMarkup'>
+  )> }
+);
+
+export type CharacterCreateOneMutationVariables = Exact<{
+  record: CreateOneCharacterInput;
+}>;
+
+
+export type CharacterCreateOneMutation = (
+  { __typename?: 'Mutation' }
+  & { characterCreateOne?: Maybe<(
+    { __typename?: 'CreateOneCharacterPayload' }
+    & Pick<CreateOneCharacterPayload, 'recordId'>
+  )> }
+);
+
+export type CharacterUpdateOneMutationVariables = Exact<{
+  record: UpdateOneCharacterInput;
+  filter?: Maybe<FilterUpdateOneCharacterInput>;
+}>;
+
+
+export type CharacterUpdateOneMutation = (
+  { __typename?: 'Mutation' }
+  & { characterUpdateOne?: Maybe<(
+    { __typename?: 'UpdateOneCharacterPayload' }
+    & Pick<UpdateOneCharacterPayload, 'recordId'>
+  )> }
+);
+
 export type SearchCharactersQueryVariables = Exact<{
   realName?: Maybe<Scalars['String']>;
   characterName?: Maybe<Scalars['String']>;
@@ -1698,6 +1753,148 @@ export type SearchShowsQuery = (
 );
 
 
+export const CharacterManyDocument = gql`
+    query characterMany($limit: Int, $skip: Int) {
+  characterMany(limit: $limit, skip: $skip) {
+    _id
+    characterName
+    realName
+    coverPicture
+  }
+  characterCount
+}
+    `;
+
+/**
+ * __useCharacterManyQuery__
+ *
+ * To run a query within a React component, call `useCharacterManyQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCharacterManyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCharacterManyQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      skip: // value for 'skip'
+ *   },
+ * });
+ */
+export function useCharacterManyQuery(baseOptions?: Apollo.QueryHookOptions<CharacterManyQuery, CharacterManyQueryVariables>) {
+        return Apollo.useQuery<CharacterManyQuery, CharacterManyQueryVariables>(CharacterManyDocument, baseOptions);
+      }
+export function useCharacterManyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CharacterManyQuery, CharacterManyQueryVariables>) {
+          return Apollo.useLazyQuery<CharacterManyQuery, CharacterManyQueryVariables>(CharacterManyDocument, baseOptions);
+        }
+export type CharacterManyQueryHookResult = ReturnType<typeof useCharacterManyQuery>;
+export type CharacterManyLazyQueryHookResult = ReturnType<typeof useCharacterManyLazyQuery>;
+export type CharacterManyQueryResult = Apollo.QueryResult<CharacterManyQuery, CharacterManyQueryVariables>;
+export const CharacterOneDocument = gql`
+    query characterOne($filter: FilterFindOneCharacterInput) {
+  characterOne(filter: $filter) {
+    _id
+    characterName
+    realName
+    imdbLink
+    dob
+    coverPicture
+    bioMarkup
+  }
+}
+    `;
+
+/**
+ * __useCharacterOneQuery__
+ *
+ * To run a query within a React component, call `useCharacterOneQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCharacterOneQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCharacterOneQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useCharacterOneQuery(baseOptions?: Apollo.QueryHookOptions<CharacterOneQuery, CharacterOneQueryVariables>) {
+        return Apollo.useQuery<CharacterOneQuery, CharacterOneQueryVariables>(CharacterOneDocument, baseOptions);
+      }
+export function useCharacterOneLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CharacterOneQuery, CharacterOneQueryVariables>) {
+          return Apollo.useLazyQuery<CharacterOneQuery, CharacterOneQueryVariables>(CharacterOneDocument, baseOptions);
+        }
+export type CharacterOneQueryHookResult = ReturnType<typeof useCharacterOneQuery>;
+export type CharacterOneLazyQueryHookResult = ReturnType<typeof useCharacterOneLazyQuery>;
+export type CharacterOneQueryResult = Apollo.QueryResult<CharacterOneQuery, CharacterOneQueryVariables>;
+export const CharacterCreateOneDocument = gql`
+    mutation characterCreateOne($record: CreateOneCharacterInput!) {
+  characterCreateOne(record: $record) {
+    recordId
+  }
+}
+    `;
+export type CharacterCreateOneMutationFn = Apollo.MutationFunction<CharacterCreateOneMutation, CharacterCreateOneMutationVariables>;
+
+/**
+ * __useCharacterCreateOneMutation__
+ *
+ * To run a mutation, you first call `useCharacterCreateOneMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCharacterCreateOneMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [characterCreateOneMutation, { data, loading, error }] = useCharacterCreateOneMutation({
+ *   variables: {
+ *      record: // value for 'record'
+ *   },
+ * });
+ */
+export function useCharacterCreateOneMutation(baseOptions?: Apollo.MutationHookOptions<CharacterCreateOneMutation, CharacterCreateOneMutationVariables>) {
+        return Apollo.useMutation<CharacterCreateOneMutation, CharacterCreateOneMutationVariables>(CharacterCreateOneDocument, baseOptions);
+      }
+export type CharacterCreateOneMutationHookResult = ReturnType<typeof useCharacterCreateOneMutation>;
+export type CharacterCreateOneMutationResult = Apollo.MutationResult<CharacterCreateOneMutation>;
+export type CharacterCreateOneMutationOptions = Apollo.BaseMutationOptions<CharacterCreateOneMutation, CharacterCreateOneMutationVariables>;
+export const CharacterUpdateOneDocument = gql`
+    mutation characterUpdateOne($record: UpdateOneCharacterInput!, $filter: FilterUpdateOneCharacterInput) {
+  characterUpdateOne(record: $record, filter: $filter) {
+    recordId
+  }
+}
+    `;
+export type CharacterUpdateOneMutationFn = Apollo.MutationFunction<CharacterUpdateOneMutation, CharacterUpdateOneMutationVariables>;
+
+/**
+ * __useCharacterUpdateOneMutation__
+ *
+ * To run a mutation, you first call `useCharacterUpdateOneMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCharacterUpdateOneMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [characterUpdateOneMutation, { data, loading, error }] = useCharacterUpdateOneMutation({
+ *   variables: {
+ *      record: // value for 'record'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useCharacterUpdateOneMutation(baseOptions?: Apollo.MutationHookOptions<CharacterUpdateOneMutation, CharacterUpdateOneMutationVariables>) {
+        return Apollo.useMutation<CharacterUpdateOneMutation, CharacterUpdateOneMutationVariables>(CharacterUpdateOneDocument, baseOptions);
+      }
+export type CharacterUpdateOneMutationHookResult = ReturnType<typeof useCharacterUpdateOneMutation>;
+export type CharacterUpdateOneMutationResult = Apollo.MutationResult<CharacterUpdateOneMutation>;
+export type CharacterUpdateOneMutationOptions = Apollo.BaseMutationOptions<CharacterUpdateOneMutation, CharacterUpdateOneMutationVariables>;
 export const SearchCharactersDocument = gql`
     query searchCharacters($realName: String, $characterName: String, $limit: Int) {
   searchCharacters(
