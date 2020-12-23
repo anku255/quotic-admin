@@ -40,6 +40,8 @@ export type Query = {
   characterMany?: Maybe<Array<Maybe<Character>>>;
   characterCount?: Maybe<Scalars['Int']>;
   searchByQuery: Array<Maybe<SearchResult>>;
+  searchCharacters: Array<Maybe<Character>>;
+  searchShows: Array<Maybe<Show>>;
 };
 
 
@@ -173,6 +175,19 @@ export type QueryCharacterCountArgs = {
 
 export type QuerySearchByQueryArgs = {
   query: Scalars['String'];
+};
+
+
+export type QuerySearchCharactersArgs = {
+  characterName?: Maybe<Scalars['String']>;
+  realName?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
+};
+
+
+export type QuerySearchShowsArgs = {
+  name?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1584,6 +1599,21 @@ export type RemoveOneCharacterPayload = {
   record?: Maybe<Character>;
 };
 
+export type SearchCharactersQueryVariables = Exact<{
+  realName?: Maybe<Scalars['String']>;
+  characterName?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type SearchCharactersQuery = (
+  { __typename?: 'Query' }
+  & { searchCharacters: Array<Maybe<(
+    { __typename?: 'Character' }
+    & Pick<Character, '_id' | 'characterName' | 'coverPicture'>
+  )>> }
+);
+
 export type QuotesManyQueryVariables = Exact<{
   limit?: Maybe<Scalars['Int']>;
   skip?: Maybe<Scalars['Int']>;
@@ -1603,7 +1633,112 @@ export type QuotesManyQuery = (
   )>>> }
 );
 
+export type QuoteOneQueryVariables = Exact<{
+  filter?: Maybe<FilterFindOneQuoteInput>;
+}>;
 
+
+export type QuoteOneQuery = (
+  { __typename?: 'Query' }
+  & { quoteOne?: Maybe<(
+    { __typename?: 'Quote' }
+    & Pick<Quote, '_id' | 'raw' | 'season' | 'episode'>
+    & { characters?: Maybe<Array<Maybe<(
+      { __typename?: 'Character' }
+      & Pick<Character, '_id' | 'characterName' | 'realName'>
+    )>>>, mainCharacter?: Maybe<(
+      { __typename?: 'Character' }
+      & Pick<Character, '_id' | 'characterName' | 'realName'>
+    )>, show?: Maybe<(
+      { __typename?: 'Show' }
+      & Pick<Show, '_id' | 'name'>
+    )> }
+  )> }
+);
+
+export type QuoteCreateOneMutationVariables = Exact<{
+  record: CreateOneQuoteInput;
+}>;
+
+
+export type QuoteCreateOneMutation = (
+  { __typename?: 'Mutation' }
+  & { quoteCreateOne?: Maybe<(
+    { __typename?: 'CreateOneQuotePayload' }
+    & Pick<CreateOneQuotePayload, 'recordId'>
+  )> }
+);
+
+export type QuoteUpdateOneMutationVariables = Exact<{
+  record: UpdateOneQuoteInput;
+  filter?: Maybe<FilterUpdateOneQuoteInput>;
+}>;
+
+
+export type QuoteUpdateOneMutation = (
+  { __typename?: 'Mutation' }
+  & { quoteUpdateOne?: Maybe<(
+    { __typename?: 'UpdateOneQuotePayload' }
+    & Pick<UpdateOneQuotePayload, 'recordId'>
+  )> }
+);
+
+export type SearchShowsQueryVariables = Exact<{
+  name?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type SearchShowsQuery = (
+  { __typename?: 'Query' }
+  & { searchShows: Array<Maybe<(
+    { __typename?: 'Show' }
+    & Pick<Show, '_id' | 'name' | 'coverPicture'>
+  )>> }
+);
+
+
+export const SearchCharactersDocument = gql`
+    query searchCharacters($realName: String, $characterName: String, $limit: Int) {
+  searchCharacters(
+    realName: $realName
+    characterName: $characterName
+    limit: $limit
+  ) {
+    _id
+    characterName
+    coverPicture
+  }
+}
+    `;
+
+/**
+ * __useSearchCharactersQuery__
+ *
+ * To run a query within a React component, call `useSearchCharactersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchCharactersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchCharactersQuery({
+ *   variables: {
+ *      realName: // value for 'realName'
+ *      characterName: // value for 'characterName'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useSearchCharactersQuery(baseOptions?: Apollo.QueryHookOptions<SearchCharactersQuery, SearchCharactersQueryVariables>) {
+        return Apollo.useQuery<SearchCharactersQuery, SearchCharactersQueryVariables>(SearchCharactersDocument, baseOptions);
+      }
+export function useSearchCharactersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchCharactersQuery, SearchCharactersQueryVariables>) {
+          return Apollo.useLazyQuery<SearchCharactersQuery, SearchCharactersQueryVariables>(SearchCharactersDocument, baseOptions);
+        }
+export type SearchCharactersQueryHookResult = ReturnType<typeof useSearchCharactersQuery>;
+export type SearchCharactersLazyQueryHookResult = ReturnType<typeof useSearchCharactersLazyQuery>;
+export type SearchCharactersQueryResult = Apollo.QueryResult<SearchCharactersQuery, SearchCharactersQueryVariables>;
 export const QuotesManyDocument = gql`
     query quotesMany($limit: Int, $skip: Int) {
   quoteMany(limit: $limit, skip: $skip) {
@@ -1644,3 +1779,154 @@ export function useQuotesManyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type QuotesManyQueryHookResult = ReturnType<typeof useQuotesManyQuery>;
 export type QuotesManyLazyQueryHookResult = ReturnType<typeof useQuotesManyLazyQuery>;
 export type QuotesManyQueryResult = Apollo.QueryResult<QuotesManyQuery, QuotesManyQueryVariables>;
+export const QuoteOneDocument = gql`
+    query quoteOne($filter: FilterFindOneQuoteInput) {
+  quoteOne(filter: $filter) {
+    _id
+    raw
+    characters {
+      _id
+      characterName
+      realName
+    }
+    mainCharacter {
+      _id
+      characterName
+      realName
+    }
+    season
+    episode
+    show {
+      _id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useQuoteOneQuery__
+ *
+ * To run a query within a React component, call `useQuoteOneQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuoteOneQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQuoteOneQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useQuoteOneQuery(baseOptions?: Apollo.QueryHookOptions<QuoteOneQuery, QuoteOneQueryVariables>) {
+        return Apollo.useQuery<QuoteOneQuery, QuoteOneQueryVariables>(QuoteOneDocument, baseOptions);
+      }
+export function useQuoteOneLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuoteOneQuery, QuoteOneQueryVariables>) {
+          return Apollo.useLazyQuery<QuoteOneQuery, QuoteOneQueryVariables>(QuoteOneDocument, baseOptions);
+        }
+export type QuoteOneQueryHookResult = ReturnType<typeof useQuoteOneQuery>;
+export type QuoteOneLazyQueryHookResult = ReturnType<typeof useQuoteOneLazyQuery>;
+export type QuoteOneQueryResult = Apollo.QueryResult<QuoteOneQuery, QuoteOneQueryVariables>;
+export const QuoteCreateOneDocument = gql`
+    mutation quoteCreateOne($record: CreateOneQuoteInput!) {
+  quoteCreateOne(record: $record) {
+    recordId
+  }
+}
+    `;
+export type QuoteCreateOneMutationFn = Apollo.MutationFunction<QuoteCreateOneMutation, QuoteCreateOneMutationVariables>;
+
+/**
+ * __useQuoteCreateOneMutation__
+ *
+ * To run a mutation, you first call `useQuoteCreateOneMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useQuoteCreateOneMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [quoteCreateOneMutation, { data, loading, error }] = useQuoteCreateOneMutation({
+ *   variables: {
+ *      record: // value for 'record'
+ *   },
+ * });
+ */
+export function useQuoteCreateOneMutation(baseOptions?: Apollo.MutationHookOptions<QuoteCreateOneMutation, QuoteCreateOneMutationVariables>) {
+        return Apollo.useMutation<QuoteCreateOneMutation, QuoteCreateOneMutationVariables>(QuoteCreateOneDocument, baseOptions);
+      }
+export type QuoteCreateOneMutationHookResult = ReturnType<typeof useQuoteCreateOneMutation>;
+export type QuoteCreateOneMutationResult = Apollo.MutationResult<QuoteCreateOneMutation>;
+export type QuoteCreateOneMutationOptions = Apollo.BaseMutationOptions<QuoteCreateOneMutation, QuoteCreateOneMutationVariables>;
+export const QuoteUpdateOneDocument = gql`
+    mutation quoteUpdateOne($record: UpdateOneQuoteInput!, $filter: FilterUpdateOneQuoteInput) {
+  quoteUpdateOne(record: $record, filter: $filter) {
+    recordId
+  }
+}
+    `;
+export type QuoteUpdateOneMutationFn = Apollo.MutationFunction<QuoteUpdateOneMutation, QuoteUpdateOneMutationVariables>;
+
+/**
+ * __useQuoteUpdateOneMutation__
+ *
+ * To run a mutation, you first call `useQuoteUpdateOneMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useQuoteUpdateOneMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [quoteUpdateOneMutation, { data, loading, error }] = useQuoteUpdateOneMutation({
+ *   variables: {
+ *      record: // value for 'record'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useQuoteUpdateOneMutation(baseOptions?: Apollo.MutationHookOptions<QuoteUpdateOneMutation, QuoteUpdateOneMutationVariables>) {
+        return Apollo.useMutation<QuoteUpdateOneMutation, QuoteUpdateOneMutationVariables>(QuoteUpdateOneDocument, baseOptions);
+      }
+export type QuoteUpdateOneMutationHookResult = ReturnType<typeof useQuoteUpdateOneMutation>;
+export type QuoteUpdateOneMutationResult = Apollo.MutationResult<QuoteUpdateOneMutation>;
+export type QuoteUpdateOneMutationOptions = Apollo.BaseMutationOptions<QuoteUpdateOneMutation, QuoteUpdateOneMutationVariables>;
+export const SearchShowsDocument = gql`
+    query searchShows($name: String, $limit: Int) {
+  searchShows(name: $name, limit: $limit) {
+    _id
+    name
+    coverPicture
+  }
+}
+    `;
+
+/**
+ * __useSearchShowsQuery__
+ *
+ * To run a query within a React component, call `useSearchShowsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchShowsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchShowsQuery({
+ *   variables: {
+ *      name: // value for 'name'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useSearchShowsQuery(baseOptions?: Apollo.QueryHookOptions<SearchShowsQuery, SearchShowsQueryVariables>) {
+        return Apollo.useQuery<SearchShowsQuery, SearchShowsQueryVariables>(SearchShowsDocument, baseOptions);
+      }
+export function useSearchShowsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchShowsQuery, SearchShowsQueryVariables>) {
+          return Apollo.useLazyQuery<SearchShowsQuery, SearchShowsQueryVariables>(SearchShowsDocument, baseOptions);
+        }
+export type SearchShowsQueryHookResult = ReturnType<typeof useSearchShowsQuery>;
+export type SearchShowsLazyQueryHookResult = ReturnType<typeof useSearchShowsLazyQuery>;
+export type SearchShowsQueryResult = Apollo.QueryResult<SearchShowsQuery, SearchShowsQueryVariables>;

@@ -33,8 +33,8 @@ const App = () => (
         {/* add routes without layouts */}
         {/* <Route path="/landing" exact component={Landing} />
         <Route path="/profile" exact component={Profile} /> */}
-        <Route path="/quotes" exact component={Quotes} />
-        <Redirect from="/" to="/quotes" />
+        <Redirect exact from="/" to="/quotes" />
+        <Route path="/quotes" component={Quotes} />
 
         {/* add redirect for first page */}
         <Redirect from="*" to="/" />

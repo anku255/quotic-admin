@@ -1,11 +1,17 @@
 import React from "react";
-import { Route, Switch } from "react-router";
+import { Route, Switch, useRouteMatch } from "react-router";
+import { AddEditQuote } from "./AddEditQuote";
 import { QuoteTable } from "./QuoteTable";
 
-const QuotesRoutes = () => (
-  <Switch>
-    <Route path="/" component={QuoteTable} />
-  </Switch>
-);
+const QuotesRoutes = () => {
+  const match = useRouteMatch();
+
+  return (
+    <Switch>
+      <Route exact path={`${match.path}/:quoteId`} component={AddEditQuote} />
+      <Route path="/" component={QuoteTable} />
+    </Switch>
+  );
+};
 
 export default QuotesRoutes;
