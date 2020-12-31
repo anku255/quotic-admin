@@ -18,9 +18,10 @@ import "assets/styles/tailwind.css";
 // import Index from "views/Index";
 import Quotes from "modules/quotes";
 import Characters from "modules/characters";
+import Shows from "modules/shows";
 
 const client = new ApolloClient({
-  uri: "http://localhost:8000/graphql",
+  uri: `${process.env.REACT_APP_API_URL}/graphql`,
   cache: new InMemoryCache(),
 });
 
@@ -37,6 +38,7 @@ const App = () => (
         <Redirect exact from="/" to="/quotes" />
         <Route path="/quotes" component={Quotes} />
         <Route path="/characters" component={Characters} />
+        <Route path="/shows" component={Shows} />
 
         {/* add redirect for first page */}
         <Redirect from="*" to="/" />

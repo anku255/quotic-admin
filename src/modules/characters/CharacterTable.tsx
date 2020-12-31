@@ -43,7 +43,7 @@ const Table = ({ color = "light", characters }: { color?: string; characters: IC
       <div className="px-4 py-3 mb-0 border-0 rounded-t">
         <div className="flex flex-wrap items-center">
           <div className="relative flex-1 flex-grow w-full max-w-full px-4">
-            <h3 className={"font-semibold text-lg " + (color === "light" ? "text-gray-800" : "text-white")}>Quotes</h3>
+            <h3 className={"font-semibold text-lg " + (color === "light" ? "text-gray-800" : "text-white")}>Characters</h3>
           </div>
         </div>
       </div>

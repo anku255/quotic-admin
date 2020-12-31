@@ -42,6 +42,8 @@ export type Query = {
   searchByQuery: Array<Maybe<SearchResult>>;
   searchCharacters: Array<Maybe<Character>>;
   searchShows: Array<Maybe<Show>>;
+  trendingQuotes: Array<Maybe<TrendingQuote>>;
+  trendingShows: Array<Maybe<Show>>;
 };
 
 
@@ -191,6 +193,16 @@ export type QuerySearchShowsArgs = {
 };
 
 
+export type QueryTrendingQuotesArgs = {
+  limit: Scalars['Int'];
+};
+
+
+export type QueryTrendingShowsArgs = {
+  limit: Scalars['Int'];
+};
+
+
 export type User = {
   __typename?: 'User';
   fullName?: Maybe<Scalars['String']>;
@@ -335,13 +347,13 @@ export type Show = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodes>>>;
-  characters?: Maybe<Array<Maybe<Character>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
   _id: Scalars['MongoID'];
   updatedAt?: Maybe<Scalars['Date']>;
   createdAt?: Maybe<Scalars['Date']>;
+  characters?: Maybe<Array<Maybe<Character>>>;
 };
 
 
@@ -522,7 +534,6 @@ export type FilterFindOneShowInput = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodesInput>>>;
-  characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
@@ -569,7 +580,6 @@ export type FilterFindManyShowInput = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodesInput>>>;
-  characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
@@ -611,7 +621,6 @@ export type FilterShowInput = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodesInput>>>;
-  characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
@@ -758,6 +767,12 @@ export type SearchResult = {
   showName?: Maybe<Scalars['String']>;
   characterName?: Maybe<Scalars['String']>;
   quote?: Maybe<Scalars['String']>;
+};
+
+export type TrendingQuote = {
+  __typename?: 'TrendingQuote';
+  quote: Quote;
+  quotesCount: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -1281,7 +1296,6 @@ export type CreateOneShowInput = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodesInput>>>;
-  characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
@@ -1305,7 +1319,6 @@ export type UpdateByIdShowInput = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodesInput>>>;
-  characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
@@ -1330,7 +1343,6 @@ export type UpdateOneShowInput = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodesInput>>>;
-  characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
@@ -1346,7 +1358,6 @@ export type FilterUpdateOneShowInput = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodesInput>>>;
-  characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
@@ -1404,7 +1415,6 @@ export type FilterRemoveOneShowInput = {
   year?: Maybe<Scalars['Float']>;
   seasons?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Array<Maybe<ShowEpisodesInput>>>;
-  characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   coverPicture?: Maybe<Scalars['String']>;
   imdbLink?: Maybe<Scalars['String']>;
   rating?: Maybe<Scalars['Float']>;
@@ -1750,6 +1760,25 @@ export type SearchShowsQuery = (
     { __typename?: 'Show' }
     & Pick<Show, '_id' | 'name' | 'coverPicture'>
   )>> }
+);
+
+export type ShowManyQueryVariables = Exact<{
+  limit?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type ShowManyQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'showCount'>
+  & { showMany?: Maybe<Array<Maybe<(
+    { __typename?: 'Show' }
+    & Pick<Show, '_id' | 'name' | 'coverPicture' | 'seasons' | 'year'>
+    & { episodes?: Maybe<Array<Maybe<(
+      { __typename?: 'ShowEpisodes' }
+      & Pick<ShowEpisodes, 'season' | 'episodes'>
+    )>>> }
+  )>>> }
 );
 
 
@@ -2127,3 +2156,46 @@ export function useSearchShowsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type SearchShowsQueryHookResult = ReturnType<typeof useSearchShowsQuery>;
 export type SearchShowsLazyQueryHookResult = ReturnType<typeof useSearchShowsLazyQuery>;
 export type SearchShowsQueryResult = Apollo.QueryResult<SearchShowsQuery, SearchShowsQueryVariables>;
+export const ShowManyDocument = gql`
+    query showMany($limit: Int, $skip: Int) {
+  showMany(limit: $limit, skip: $skip) {
+    _id
+    name
+    coverPicture
+    seasons
+    episodes {
+      season
+      episodes
+    }
+    year
+  }
+  showCount
+}
+    `;
+
+/**
+ * __useShowManyQuery__
+ *
+ * To run a query within a React component, call `useShowManyQuery` and pass it any options that fit your needs.
+ * When your component renders, `useShowManyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useShowManyQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      skip: // value for 'skip'
+ *   },
+ * });
+ */
+export function useShowManyQuery(baseOptions?: Apollo.QueryHookOptions<ShowManyQuery, ShowManyQueryVariables>) {
+        return Apollo.useQuery<ShowManyQuery, ShowManyQueryVariables>(ShowManyDocument, baseOptions);
+      }
+export function useShowManyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ShowManyQuery, ShowManyQueryVariables>) {
+          return Apollo.useLazyQuery<ShowManyQuery, ShowManyQueryVariables>(ShowManyDocument, baseOptions);
+        }
+export type ShowManyQueryHookResult = ReturnType<typeof useShowManyQuery>;
+export type ShowManyLazyQueryHookResult = ReturnType<typeof useShowManyLazyQuery>;
+export type ShowManyQueryResult = Apollo.QueryResult<ShowManyQuery, ShowManyQueryVariables>;
