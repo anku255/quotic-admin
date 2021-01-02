@@ -39,7 +39,7 @@ export const Input = ({
     <div className="relative w-full mb-3">
       <label
         className="block mb-2 text-xs font-bold text-gray-700 uppercase"
-        htmlFor="grid-password"
+        htmlFor={name}
       >
         {label}&nbsp;
         {required && <span className="ml-2 text-sm text-red-400">&#42;</span>}
@@ -65,5 +65,3 @@ export const Input = ({
     </div>
   );
 };
-
-export default Input;

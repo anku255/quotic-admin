@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useApolloClient, ApolloClient } from "@apollo/client";
 import { FormProvider, useForm } from "react-hook-form";
 
-import Input from "components/Form/Input";
+import { Input } from "components/Form/Input";
 import { RichTextArea, getHtmlMarkdownConverter } from "components/Form/RichTextArea";
 import { AsyncSelectField } from "components/Form/Select";
 import { SEARCH_CHARACTERS_QUERY } from "./gql/characters.gql";

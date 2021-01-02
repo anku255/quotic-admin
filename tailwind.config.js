@@ -9,6 +9,8 @@ module.exports = {
       "./public/**/*.html",
       "./public/*.html",
       "./src/**/*.js",
+      "./src/**/*.tsx",
+      "./src/*.tsx",
       "./src/*.js",
       "./src/**/*.html",
       "./src/*.html",

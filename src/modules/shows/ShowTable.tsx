@@ -4,7 +4,7 @@ import { Pagination } from "components/Pagination";
 import { History } from "history";
 import { Link } from "react-router-dom";
 
-type IShow = Pick<Show, "_id" | "name" | "coverPicture" | 'seasons' | 'episodes' | 'year'>;
+type IShow = Pick<Show, "_id" | "name" | "coverPicture" | "seasons" | "episodes" | "year">;
 
 const Heading = ({ color = "light", children }) => (
   <th
@@ -17,45 +17,41 @@ const Heading = ({ color = "light", children }) => (
   </th>
 );
 
-const TableRow = ({ color = "light", index, id,  name, coverPicture, seasons, episodes, year }) => (
+const TableRow = ({ color = "light", index, id, name, coverPicture, seasons, episodes, year }) => (
   <tr>
     <td className="p-4 px-6 text-xs whitespace-no-wrap align-middle border-t-0 border-l-0 border-r-0">{index}</td>
     <td className="p-4 px-6 text-xs whitespace-no-wrap align-middle border-t-0 border-l-0 border-r-0">
       <Link to={`/shows/add-edit?showId=${id}`}>
-        <div style={{  }} className="truncate">
-          <img
-            src={coverPicture}
-            alt={name}
-            className={"ml-4 w-10 h-16 rounded-lg  border-2 border-gray-100 shadow"}
-          />
+        <div style={{}} className="truncate">
+          <img src={coverPicture} alt={name} className={"ml-4 w-10 h-16 rounded-lg  border-2 border-gray-100 shadow"} />
         </div>
       </Link>
     </td>
     <td className="p-4 px-6 text-xs whitespace-no-wrap align-middle border-t-0 border-l-0 border-r-0">
       <Link to={`/shows/add-edit?showId=${id}`}>
-        <div style={{  }} className="truncate">
+        <div style={{}} className="truncate">
           {name}
         </div>
       </Link>
     </td>
     <td className="p-4 px-6 text-xs whitespace-no-wrap align-middle border-t-0 border-l-0 border-r-0">
       <Link to={`/shows/add-edit?showId=${id}`}>
-        <div style={{  }} className="truncate">
+        <div style={{}} className="truncate">
           {year}
         </div>
       </Link>
     </td>
     <td className="p-4 px-6 text-xs whitespace-no-wrap align-middle border-t-0 border-l-0 border-r-0">
       <Link to={`/shows/add-edit?showId=${id}`}>
-        <div style={{  }} className="truncate">
+        <div style={{}} className="truncate">
           {seasons}
         </div>
       </Link>
     </td>
     <td className="p-4 px-6 text-xs whitespace-no-wrap align-middle border-t-0 border-l-0 border-r-0">
       <Link to={`/shows/add-edit?showId=${id}`}>
-        <div style={{  }} className="truncate">
-          {episodes ? episodes.reduce((sum, curr) => sum + curr.episodes, 0) : ''}
+        <div style={{}} className="truncate">
+          {episodes ? episodes.reduce((sum, curr) => sum + curr.episodes, 0) : ""}
         </div>
       </Link>
     </td>
@@ -66,9 +62,19 @@ const Table = ({ color = "light", shows }: { color?: string; shows: IShow[] }) =
   return (
     <div className={"relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded " + (color === "light" ? "bg-white" : "bg-blue-900 text-white")}>
       <div className="px-4 py-3 mb-0 border-0 rounded-t">
-        <div className="flex flex-wrap items-center">
+        <div className="flex flex-wrap items-center justify-between">
           <div className="relative flex-1 flex-grow w-full max-w-full px-4">
             <h3 className={"font-semibold text-lg " + (color === "light" ? "text-gray-800" : "text-white")}>Shows</h3>
+          </div>
+          <div className="">
+            <Link to="/shows/add-edit">
+              <button
+                className="px-4 py-2 mr-1 text-xs font-bold text-white uppercase transition-all duration-150 ease-linear bg-blue-500 rounded shadow outline-none active:bg-blue-600 hover:shadow-md focus:outline-none"
+                type="button"
+              >
+                Add Show
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -86,8 +92,8 @@ const Table = ({ color = "light", shows }: { color?: string; shows: IShow[] }) =
             </tr>
           </thead>
           <tbody>
-            {shows.map(({_id, name, coverPicture, seasons, episodes, year}, i) => (
-              <TableRow key={_id} {...{index: i+1, id: _id, name, coverPicture, seasons, episodes, year}} />
+            {shows.map(({ _id, name, coverPicture, seasons, episodes, year }, i) => (
+              <TableRow key={_id} {...{ index: i + 1, id: _id, name, coverPicture, seasons, episodes, year }} />
             ))}
           </tbody>
         </table>

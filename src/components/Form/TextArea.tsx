@@ -23,9 +23,9 @@ export const TextArea = ({
 }: Props) => {
   const { register } = useFormContext();
   return (
-    <div className="w-full">
+    <div className="w-full mb-3">
       {label && (
-        <label htmlFor={name} className="">
+        <label htmlFor={name}  className="block mb-2 text-xs font-bold text-gray-700 uppercase">
           {label}{" "}
           {required && <span className="ml-2 text-sm text-red-500">&#42;</span>}
         </label>

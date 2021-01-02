@@ -1,14 +1,14 @@
 import React from "react";
-import { Route, Switch } from "react-router";
-// import { AddEditCharacter } from "./AddEditCharacter";
+import { Route, Switch, useRouteMatch } from "react-router";
+import { AddEditShow } from "./AddEditShow";
 import { ShowTable } from "./ShowTable";
 
 const ShowRoutes = () => {
-  // const match = useRouteMatch();
+  const match = useRouteMatch();
   //
   return (
     <Switch>
-      {/* <Route exact path={`${match.path}/:characterId`} component={AddEditCharacter} /> */}
+      <Route exact path={`${match.path}/add-edit`} component={AddEditShow} />
       <Route path="/" component={ShowTable} />
     </Switch>
   );

@@ -44,6 +44,7 @@ export type Query = {
   searchShows: Array<Maybe<Show>>;
   trendingQuotes: Array<Maybe<TrendingQuote>>;
   trendingShows: Array<Maybe<Show>>;
+  getShowDataFromIMDB?: Maybe<ShowData>;
 };
 
 
@@ -203,6 +204,11 @@ export type QueryTrendingShowsArgs = {
 };
 
 
+export type QueryGetShowDataFromImdbArgs = {
+  IMDBShowCode: Scalars['String'];
+};
+
+
 export type User = {
   __typename?: 'User';
   fullName?: Maybe<Scalars['String']>;
@@ -353,13 +359,8 @@ export type Show = {
   _id: Scalars['MongoID'];
   updatedAt?: Maybe<Scalars['Date']>;
   createdAt?: Maybe<Scalars['Date']>;
+  /** Sub items with a custom type */
   characters?: Maybe<Array<Maybe<Character>>>;
-};
-
-
-export type ShowCharactersArgs = {
-  limit?: Maybe<Scalars['Int']>;
-  sort?: Maybe<SortFindByIdsCharacterInput>;
 };
 
 export enum EnumShowType {
@@ -372,11 +373,6 @@ export type ShowEpisodes = {
   season?: Maybe<Scalars['Float']>;
   episodes?: Maybe<Scalars['Float']>;
 };
-
-export enum SortFindByIdsCharacterInput {
-  IdAsc = '_ID_ASC',
-  IdDesc = '_ID_DESC'
-}
 
 export type Character = {
   __typename?: 'Character';
@@ -399,6 +395,11 @@ export type CharacterShowsArgs = {
 };
 
 export enum SortFindByIdsShowInput {
+  IdAsc = '_ID_ASC',
+  IdDesc = '_ID_DESC'
+}
+
+export enum SortFindByIdsCharacterInput {
   IdAsc = '_ID_ASC',
   IdDesc = '_ID_DESC'
 }
@@ -773,6 +774,31 @@ export type TrendingQuote = {
   __typename?: 'TrendingQuote';
   quote: Quote;
   quotesCount: Scalars['Int'];
+};
+
+export type ShowData = {
+  __typename?: 'ShowData';
+  name: Scalars['String'];
+  description: Scalars['String'];
+  genre: Array<Maybe<Scalars['String']>>;
+  type: ShowTypeEnum;
+  year: Scalars['Int'];
+  seasons?: Maybe<Scalars['Int']>;
+  episodes?: Maybe<Array<Maybe<Episode>>>;
+  coverPicture: Scalars['String'];
+  imdbLink: Scalars['String'];
+  rating: Scalars['Float'];
+};
+
+export enum ShowTypeEnum {
+  Series = 'SERIES',
+  Movie = 'MOVIE'
+}
+
+export type Episode = {
+  __typename?: 'Episode';
+  season: Scalars['Int'];
+  episodes: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -1762,6 +1788,67 @@ export type SearchShowsQuery = (
   )>> }
 );
 
+export type GetShowDataFromImdbQueryVariables = Exact<{
+  IMDBShowCode: Scalars['String'];
+}>;
+
+
+export type GetShowDataFromImdbQuery = (
+  { __typename?: 'Query' }
+  & { getShowDataFromIMDB?: Maybe<(
+    { __typename?: 'ShowData' }
+    & Pick<ShowData, 'name' | 'description' | 'genre' | 'type' | 'year' | 'coverPicture' | 'rating' | 'seasons' | 'imdbLink'>
+    & { episodes?: Maybe<Array<Maybe<(
+      { __typename?: 'Episode' }
+      & Pick<Episode, 'season' | 'episodes'>
+    )>>> }
+  )> }
+);
+
+export type ShowOneQueryVariables = Exact<{
+  filter?: Maybe<FilterFindOneShowInput>;
+}>;
+
+
+export type ShowOneQuery = (
+  { __typename?: 'Query' }
+  & { showOne?: Maybe<(
+    { __typename?: 'Show' }
+    & Pick<Show, 'name' | 'description' | 'genre' | 'type' | 'year' | 'coverPicture' | 'rating' | 'seasons' | 'imdbLink'>
+    & { episodes?: Maybe<Array<Maybe<(
+      { __typename?: 'ShowEpisodes' }
+      & Pick<ShowEpisodes, 'season' | 'episodes'>
+    )>>> }
+  )> }
+);
+
+export type ShowCreateOneMutationVariables = Exact<{
+  record: CreateOneShowInput;
+}>;
+
+
+export type ShowCreateOneMutation = (
+  { __typename?: 'Mutation' }
+  & { showCreateOne?: Maybe<(
+    { __typename?: 'CreateOneShowPayload' }
+    & Pick<CreateOneShowPayload, 'recordId'>
+  )> }
+);
+
+export type ShowUpdateOneMutationVariables = Exact<{
+  record: UpdateOneShowInput;
+  filter?: Maybe<FilterUpdateOneShowInput>;
+}>;
+
+
+export type ShowUpdateOneMutation = (
+  { __typename?: 'Mutation' }
+  & { showUpdateOne?: Maybe<(
+    { __typename?: 'UpdateOneShowPayload' }
+    & Pick<UpdateOneShowPayload, 'recordId'>
+  )> }
+);
+
 export type ShowManyQueryVariables = Exact<{
   limit?: Maybe<Scalars['Int']>;
   skip?: Maybe<Scalars['Int']>;
@@ -2156,6 +2243,161 @@ export function useSearchShowsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type SearchShowsQueryHookResult = ReturnType<typeof useSearchShowsQuery>;
 export type SearchShowsLazyQueryHookResult = ReturnType<typeof useSearchShowsLazyQuery>;
 export type SearchShowsQueryResult = Apollo.QueryResult<SearchShowsQuery, SearchShowsQueryVariables>;
+export const GetShowDataFromImdbDocument = gql`
+    query getShowDataFromIMDB($IMDBShowCode: String!) {
+  getShowDataFromIMDB(IMDBShowCode: $IMDBShowCode) {
+    name
+    description
+    genre
+    type
+    year
+    coverPicture
+    rating
+    seasons
+    imdbLink
+    episodes {
+      season
+      episodes
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetShowDataFromImdbQuery__
+ *
+ * To run a query within a React component, call `useGetShowDataFromImdbQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetShowDataFromImdbQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetShowDataFromImdbQuery({
+ *   variables: {
+ *      IMDBShowCode: // value for 'IMDBShowCode'
+ *   },
+ * });
+ */
+export function useGetShowDataFromImdbQuery(baseOptions: Apollo.QueryHookOptions<GetShowDataFromImdbQuery, GetShowDataFromImdbQueryVariables>) {
+        return Apollo.useQuery<GetShowDataFromImdbQuery, GetShowDataFromImdbQueryVariables>(GetShowDataFromImdbDocument, baseOptions);
+      }
+export function useGetShowDataFromImdbLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetShowDataFromImdbQuery, GetShowDataFromImdbQueryVariables>) {
+          return Apollo.useLazyQuery<GetShowDataFromImdbQuery, GetShowDataFromImdbQueryVariables>(GetShowDataFromImdbDocument, baseOptions);
+        }
+export type GetShowDataFromImdbQueryHookResult = ReturnType<typeof useGetShowDataFromImdbQuery>;
+export type GetShowDataFromImdbLazyQueryHookResult = ReturnType<typeof useGetShowDataFromImdbLazyQuery>;
+export type GetShowDataFromImdbQueryResult = Apollo.QueryResult<GetShowDataFromImdbQuery, GetShowDataFromImdbQueryVariables>;
+export const ShowOneDocument = gql`
+    query showOne($filter: FilterFindOneShowInput) {
+  showOne(filter: $filter) {
+    name
+    description
+    genre
+    type
+    year
+    coverPicture
+    rating
+    seasons
+    imdbLink
+    episodes {
+      season
+      episodes
+    }
+  }
+}
+    `;
+
+/**
+ * __useShowOneQuery__
+ *
+ * To run a query within a React component, call `useShowOneQuery` and pass it any options that fit your needs.
+ * When your component renders, `useShowOneQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useShowOneQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useShowOneQuery(baseOptions?: Apollo.QueryHookOptions<ShowOneQuery, ShowOneQueryVariables>) {
+        return Apollo.useQuery<ShowOneQuery, ShowOneQueryVariables>(ShowOneDocument, baseOptions);
+      }
+export function useShowOneLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ShowOneQuery, ShowOneQueryVariables>) {
+          return Apollo.useLazyQuery<ShowOneQuery, ShowOneQueryVariables>(ShowOneDocument, baseOptions);
+        }
+export type ShowOneQueryHookResult = ReturnType<typeof useShowOneQuery>;
+export type ShowOneLazyQueryHookResult = ReturnType<typeof useShowOneLazyQuery>;
+export type ShowOneQueryResult = Apollo.QueryResult<ShowOneQuery, ShowOneQueryVariables>;
+export const ShowCreateOneDocument = gql`
+    mutation showCreateOne($record: CreateOneShowInput!) {
+  showCreateOne(record: $record) {
+    recordId
+  }
+}
+    `;
+export type ShowCreateOneMutationFn = Apollo.MutationFunction<ShowCreateOneMutation, ShowCreateOneMutationVariables>;
+
+/**
+ * __useShowCreateOneMutation__
+ *
+ * To run a mutation, you first call `useShowCreateOneMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useShowCreateOneMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [showCreateOneMutation, { data, loading, error }] = useShowCreateOneMutation({
+ *   variables: {
+ *      record: // value for 'record'
+ *   },
+ * });
+ */
+export function useShowCreateOneMutation(baseOptions?: Apollo.MutationHookOptions<ShowCreateOneMutation, ShowCreateOneMutationVariables>) {
+        return Apollo.useMutation<ShowCreateOneMutation, ShowCreateOneMutationVariables>(ShowCreateOneDocument, baseOptions);
+      }
+export type ShowCreateOneMutationHookResult = ReturnType<typeof useShowCreateOneMutation>;
+export type ShowCreateOneMutationResult = Apollo.MutationResult<ShowCreateOneMutation>;
+export type ShowCreateOneMutationOptions = Apollo.BaseMutationOptions<ShowCreateOneMutation, ShowCreateOneMutationVariables>;
+export const ShowUpdateOneDocument = gql`
+    mutation showUpdateOne($record: UpdateOneShowInput!, $filter: FilterUpdateOneShowInput) {
+  showUpdateOne(record: $record, filter: $filter) {
+    recordId
+  }
+}
+    `;
+export type ShowUpdateOneMutationFn = Apollo.MutationFunction<ShowUpdateOneMutation, ShowUpdateOneMutationVariables>;
+
+/**
+ * __useShowUpdateOneMutation__
+ *
+ * To run a mutation, you first call `useShowUpdateOneMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useShowUpdateOneMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [showUpdateOneMutation, { data, loading, error }] = useShowUpdateOneMutation({
+ *   variables: {
+ *      record: // value for 'record'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useShowUpdateOneMutation(baseOptions?: Apollo.MutationHookOptions<ShowUpdateOneMutation, ShowUpdateOneMutationVariables>) {
+        return Apollo.useMutation<ShowUpdateOneMutation, ShowUpdateOneMutationVariables>(ShowUpdateOneDocument, baseOptions);
+      }
+export type ShowUpdateOneMutationHookResult = ReturnType<typeof useShowUpdateOneMutation>;
+export type ShowUpdateOneMutationResult = Apollo.MutationResult<ShowUpdateOneMutation>;
+export type ShowUpdateOneMutationOptions = Apollo.BaseMutationOptions<ShowUpdateOneMutation, ShowUpdateOneMutationVariables>;
 export const ShowManyDocument = gql`
     query showMany($limit: Int, $skip: Int) {
   showMany(limit: $limit, skip: $skip) {
