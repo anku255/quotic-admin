@@ -45,6 +45,7 @@ export type Query = {
   trendingQuotes: Array<Maybe<TrendingQuote>>;
   trendingShows: Array<Maybe<Show>>;
   getShowDataFromIMDB?: Maybe<ShowData>;
+  getCharactersFromIMDB?: Maybe<Array<Maybe<ImdbCharacter>>>;
 };
 
 
@@ -206,6 +207,12 @@ export type QueryTrendingShowsArgs = {
 
 export type QueryGetShowDataFromImdbArgs = {
   IMDBShowCode: Scalars['String'];
+};
+
+
+export type QueryGetCharactersFromImdbArgs = {
+  IMDBShowCode: Scalars['String'];
+  type: ShowTypeEnum;
 };
 
 
@@ -801,6 +808,16 @@ export type Episode = {
   episodes: Scalars['Int'];
 };
 
+export type ImdbCharacter = {
+  __typename?: 'IMDBCharacter';
+  characterName?: Maybe<Scalars['String']>;
+  realName?: Maybe<Scalars['String']>;
+  imdbLink?: Maybe<Scalars['String']>;
+  dob?: Maybe<Scalars['String']>;
+  coverPicture?: Maybe<Scalars['String']>;
+  bioMarkup?: Maybe<Scalars['String']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   /** Create one document with mongoose defaults, setters, hooks and validation */
@@ -839,6 +856,8 @@ export type Mutation = {
   showRemoveOne?: Maybe<RemoveOneShowPayload>;
   /** Create one document with mongoose defaults, setters, hooks and validation */
   characterCreateOne?: Maybe<CreateOneCharacterPayload>;
+  /** Creates Many documents with mongoose defaults, setters, hooks and validation */
+  characterCreateMany?: Maybe<CreateManyCharacterPayload>;
   /** Update one document: 1) Retrieve one document by findById. 2) Apply updates to mongoose document. 3) Mongoose applies defaults, setters, hooks and validation. 4) And save it. */
   characterUpdateById?: Maybe<UpdateByIdCharacterPayload>;
   /** Update one document: 1) Retrieve one document via findOne. 2) Apply updates to mongoose document. 3) Mongoose applies defaults, setters, hooks and validation. 4) And save it. */
@@ -957,6 +976,11 @@ export type MutationShowRemoveOneArgs = {
 
 export type MutationCharacterCreateOneArgs = {
   record: CreateOneCharacterInput;
+};
+
+
+export type MutationCharacterCreateManyArgs = {
+  records: Array<CreateManyCharacterInput>;
 };
 
 
@@ -1502,6 +1526,28 @@ export type CreateOneCharacterPayload = {
   record?: Maybe<Character>;
 };
 
+export type CreateManyCharacterInput = {
+  characterName: Scalars['String'];
+  realName: Scalars['String'];
+  imdbLink: Scalars['String'];
+  dob?: Maybe<Scalars['Date']>;
+  coverPicture: Scalars['String'];
+  shows?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
+  bioMarkup?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['Date']>;
+  createdAt?: Maybe<Scalars['Date']>;
+};
+
+export type CreateManyCharacterPayload = {
+  __typename?: 'CreateManyCharacterPayload';
+  /** Created document ID */
+  recordIds: Array<Maybe<Scalars['MongoID']>>;
+  /** Created documents */
+  records: Array<Maybe<Character>>;
+  /** Count of all documents created */
+  createCount: Scalars['Int'];
+};
+
 export type UpdateByIdCharacterInput = {
   characterName?: Maybe<Scalars['String']>;
   realName?: Maybe<Scalars['String']>;
@@ -1788,6 +1834,52 @@ export type SearchShowsQuery = (
   )>> }
 );
 
+export type GetCharactersFromImdbQueryVariables = Exact<{
+  IMDBShowCode: Scalars['String'];
+  type: ShowTypeEnum;
+}>;
+
+
+export type GetCharactersFromImdbQuery = (
+  { __typename?: 'Query' }
+  & { getCharactersFromIMDB?: Maybe<Array<Maybe<(
+    { __typename?: 'IMDBCharacter' }
+    & Pick<ImdbCharacter, 'characterName' | 'realName' | 'dob' | 'coverPicture' | 'imdbLink' | 'bioMarkup'>
+  )>>> }
+);
+
+export type CharacterCreateManyMutationVariables = Exact<{
+  characters: Array<CreateManyCharacterInput>;
+}>;
+
+
+export type CharacterCreateManyMutation = (
+  { __typename?: 'Mutation' }
+  & { characterCreateMany?: Maybe<(
+    { __typename?: 'CreateManyCharacterPayload' }
+    & Pick<CreateManyCharacterPayload, 'createCount'>
+  )> }
+);
+
+export type ShowManyQueryVariables = Exact<{
+  limit?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type ShowManyQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'showCount'>
+  & { showMany?: Maybe<Array<Maybe<(
+    { __typename?: 'Show' }
+    & Pick<Show, '_id' | 'name' | 'coverPicture' | 'seasons' | 'year'>
+    & { episodes?: Maybe<Array<Maybe<(
+      { __typename?: 'ShowEpisodes' }
+      & Pick<ShowEpisodes, 'season' | 'episodes'>
+    )>>> }
+  )>>> }
+);
+
 export type GetShowDataFromImdbQueryVariables = Exact<{
   IMDBShowCode: Scalars['String'];
 }>;
@@ -1814,7 +1906,7 @@ export type ShowOneQuery = (
   { __typename?: 'Query' }
   & { showOne?: Maybe<(
     { __typename?: 'Show' }
-    & Pick<Show, 'name' | 'description' | 'genre' | 'type' | 'year' | 'coverPicture' | 'rating' | 'seasons' | 'imdbLink'>
+    & Pick<Show, '_id' | 'name' | 'description' | 'genre' | 'type' | 'year' | 'coverPicture' | 'rating' | 'seasons' | 'imdbLink'>
     & { episodes?: Maybe<Array<Maybe<(
       { __typename?: 'ShowEpisodes' }
       & Pick<ShowEpisodes, 'season' | 'episodes'>
@@ -1847,25 +1939,6 @@ export type ShowUpdateOneMutation = (
     { __typename?: 'UpdateOneShowPayload' }
     & Pick<UpdateOneShowPayload, 'recordId'>
   )> }
-);
-
-export type ShowManyQueryVariables = Exact<{
-  limit?: Maybe<Scalars['Int']>;
-  skip?: Maybe<Scalars['Int']>;
-}>;
-
-
-export type ShowManyQuery = (
-  { __typename?: 'Query' }
-  & Pick<Query, 'showCount'>
-  & { showMany?: Maybe<Array<Maybe<(
-    { __typename?: 'Show' }
-    & Pick<Show, '_id' | 'name' | 'coverPicture' | 'seasons' | 'year'>
-    & { episodes?: Maybe<Array<Maybe<(
-      { __typename?: 'ShowEpisodes' }
-      & Pick<ShowEpisodes, 'season' | 'episodes'>
-    )>>> }
-  )>>> }
 );
 
 
@@ -2243,6 +2316,120 @@ export function useSearchShowsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type SearchShowsQueryHookResult = ReturnType<typeof useSearchShowsQuery>;
 export type SearchShowsLazyQueryHookResult = ReturnType<typeof useSearchShowsLazyQuery>;
 export type SearchShowsQueryResult = Apollo.QueryResult<SearchShowsQuery, SearchShowsQueryVariables>;
+export const GetCharactersFromImdbDocument = gql`
+    query getCharactersFromIMDB($IMDBShowCode: String!, $type: ShowTypeEnum!) {
+  getCharactersFromIMDB(IMDBShowCode: $IMDBShowCode, type: $type) {
+    characterName
+    realName
+    dob
+    coverPicture
+    imdbLink
+    bioMarkup
+  }
+}
+    `;
+
+/**
+ * __useGetCharactersFromImdbQuery__
+ *
+ * To run a query within a React component, call `useGetCharactersFromImdbQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCharactersFromImdbQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCharactersFromImdbQuery({
+ *   variables: {
+ *      IMDBShowCode: // value for 'IMDBShowCode'
+ *      type: // value for 'type'
+ *   },
+ * });
+ */
+export function useGetCharactersFromImdbQuery(baseOptions: Apollo.QueryHookOptions<GetCharactersFromImdbQuery, GetCharactersFromImdbQueryVariables>) {
+        return Apollo.useQuery<GetCharactersFromImdbQuery, GetCharactersFromImdbQueryVariables>(GetCharactersFromImdbDocument, baseOptions);
+      }
+export function useGetCharactersFromImdbLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCharactersFromImdbQuery, GetCharactersFromImdbQueryVariables>) {
+          return Apollo.useLazyQuery<GetCharactersFromImdbQuery, GetCharactersFromImdbQueryVariables>(GetCharactersFromImdbDocument, baseOptions);
+        }
+export type GetCharactersFromImdbQueryHookResult = ReturnType<typeof useGetCharactersFromImdbQuery>;
+export type GetCharactersFromImdbLazyQueryHookResult = ReturnType<typeof useGetCharactersFromImdbLazyQuery>;
+export type GetCharactersFromImdbQueryResult = Apollo.QueryResult<GetCharactersFromImdbQuery, GetCharactersFromImdbQueryVariables>;
+export const CharacterCreateManyDocument = gql`
+    mutation characterCreateMany($characters: [CreateManyCharacterInput!]!) {
+  characterCreateMany(records: $characters) {
+    createCount
+  }
+}
+    `;
+export type CharacterCreateManyMutationFn = Apollo.MutationFunction<CharacterCreateManyMutation, CharacterCreateManyMutationVariables>;
+
+/**
+ * __useCharacterCreateManyMutation__
+ *
+ * To run a mutation, you first call `useCharacterCreateManyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCharacterCreateManyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [characterCreateManyMutation, { data, loading, error }] = useCharacterCreateManyMutation({
+ *   variables: {
+ *      characters: // value for 'characters'
+ *   },
+ * });
+ */
+export function useCharacterCreateManyMutation(baseOptions?: Apollo.MutationHookOptions<CharacterCreateManyMutation, CharacterCreateManyMutationVariables>) {
+        return Apollo.useMutation<CharacterCreateManyMutation, CharacterCreateManyMutationVariables>(CharacterCreateManyDocument, baseOptions);
+      }
+export type CharacterCreateManyMutationHookResult = ReturnType<typeof useCharacterCreateManyMutation>;
+export type CharacterCreateManyMutationResult = Apollo.MutationResult<CharacterCreateManyMutation>;
+export type CharacterCreateManyMutationOptions = Apollo.BaseMutationOptions<CharacterCreateManyMutation, CharacterCreateManyMutationVariables>;
+export const ShowManyDocument = gql`
+    query showMany($limit: Int, $skip: Int) {
+  showMany(limit: $limit, skip: $skip) {
+    _id
+    name
+    coverPicture
+    seasons
+    episodes {
+      season
+      episodes
+    }
+    year
+  }
+  showCount
+}
+    `;
+
+/**
+ * __useShowManyQuery__
+ *
+ * To run a query within a React component, call `useShowManyQuery` and pass it any options that fit your needs.
+ * When your component renders, `useShowManyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useShowManyQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      skip: // value for 'skip'
+ *   },
+ * });
+ */
+export function useShowManyQuery(baseOptions?: Apollo.QueryHookOptions<ShowManyQuery, ShowManyQueryVariables>) {
+        return Apollo.useQuery<ShowManyQuery, ShowManyQueryVariables>(ShowManyDocument, baseOptions);
+      }
+export function useShowManyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ShowManyQuery, ShowManyQueryVariables>) {
+          return Apollo.useLazyQuery<ShowManyQuery, ShowManyQueryVariables>(ShowManyDocument, baseOptions);
+        }
+export type ShowManyQueryHookResult = ReturnType<typeof useShowManyQuery>;
+export type ShowManyLazyQueryHookResult = ReturnType<typeof useShowManyLazyQuery>;
+export type ShowManyQueryResult = Apollo.QueryResult<ShowManyQuery, ShowManyQueryVariables>;
 export const GetShowDataFromImdbDocument = gql`
     query getShowDataFromIMDB($IMDBShowCode: String!) {
   getShowDataFromIMDB(IMDBShowCode: $IMDBShowCode) {
@@ -2291,6 +2478,7 @@ export type GetShowDataFromImdbQueryResult = Apollo.QueryResult<GetShowDataFromI
 export const ShowOneDocument = gql`
     query showOne($filter: FilterFindOneShowInput) {
   showOne(filter: $filter) {
+    _id
     name
     description
     genre
@@ -2398,46 +2586,3 @@ export function useShowUpdateOneMutation(baseOptions?: Apollo.MutationHookOption
 export type ShowUpdateOneMutationHookResult = ReturnType<typeof useShowUpdateOneMutation>;
 export type ShowUpdateOneMutationResult = Apollo.MutationResult<ShowUpdateOneMutation>;
 export type ShowUpdateOneMutationOptions = Apollo.BaseMutationOptions<ShowUpdateOneMutation, ShowUpdateOneMutationVariables>;
-export const ShowManyDocument = gql`
-    query showMany($limit: Int, $skip: Int) {
-  showMany(limit: $limit, skip: $skip) {
-    _id
-    name
-    coverPicture
-    seasons
-    episodes {
-      season
-      episodes
-    }
-    year
-  }
-  showCount
-}
-    `;
-
-/**
- * __useShowManyQuery__
- *
- * To run a query within a React component, call `useShowManyQuery` and pass it any options that fit your needs.
- * When your component renders, `useShowManyQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useShowManyQuery({
- *   variables: {
- *      limit: // value for 'limit'
- *      skip: // value for 'skip'
- *   },
- * });
- */
-export function useShowManyQuery(baseOptions?: Apollo.QueryHookOptions<ShowManyQuery, ShowManyQueryVariables>) {
-        return Apollo.useQuery<ShowManyQuery, ShowManyQueryVariables>(ShowManyDocument, baseOptions);
-      }
-export function useShowManyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ShowManyQuery, ShowManyQueryVariables>) {
-          return Apollo.useLazyQuery<ShowManyQuery, ShowManyQueryVariables>(ShowManyDocument, baseOptions);
-        }
-export type ShowManyQueryHookResult = ReturnType<typeof useShowManyQuery>;
-export type ShowManyLazyQueryHookResult = ReturnType<typeof useShowManyLazyQuery>;
-export type ShowManyQueryResult = Apollo.QueryResult<ShowManyQuery, ShowManyQueryVariables>;

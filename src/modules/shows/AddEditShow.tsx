@@ -5,7 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Input } from "components/Form/Input";
 import { TextArea } from "components/Form/TextArea";
 import { InputFieldArray } from "components/Form/InputFieldArray";
-import { GET_SHOW_DATA_FROM_IMDB_QUERY, SHOW_ONE_QUERY } from "./gql/character.gql";
+import { GET_SHOW_DATA_FROM_IMDB_QUERY, SHOW_ONE_QUERY } from "./gql/show.gql";
 import { useShowCreateOneMutation, useShowUpdateOneMutation} from "generated/apolloHooks";
 import { isNotEmptyObject } from "utils/commonHelpers";
 import { SHOWS_MANY_QUERY } from "./gql/show.gql";
