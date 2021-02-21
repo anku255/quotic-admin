@@ -15,24 +15,12 @@ interface Props {
   isMulti?: boolean;
 }
 
-export const SelectField = ({
-  name,
-  label,
-  options,
-  required,
-  placeholder,
-  isClearable,
-  isDisabled,
-  isMulti = false,
-}: Props) => {
+export const SelectField = ({ name, label, options, required, placeholder, isClearable, isDisabled, isMulti = false }: Props) => {
   const { control } = useFormContext();
 
   return (
     <div className="relative w-full mb-3">
-      <label
-        className="block mb-2 text-xs font-bold text-gray-700 uppercase"
-        htmlFor="grid-password"
-      >
+      <label className="block mb-2 text-xs font-bold text-gray-700 uppercase" htmlFor="grid-password">
         {label}&nbsp;
         {required && <span className="ml-2 text-sm text-red-400">&#42;</span>}
       </label>
@@ -63,6 +51,7 @@ export const SelectField = ({
 interface AsyncSelectFieldProps {
   name: string;
   label: string;
+  defaultValue?: any;
   placeholder?: string;
   required?: boolean;
   isClearable?: boolean;
@@ -74,6 +63,7 @@ interface AsyncSelectFieldProps {
 export const AsyncSelectField = ({
   name,
   label,
+  defaultValue,
   fetchOptions,
   required = false,
   placeholder,
@@ -86,10 +76,7 @@ export const AsyncSelectField = ({
 
   return (
     <div className="relative w-full mb-3">
-      <label
-        className="block mb-2 text-xs font-bold text-gray-700 uppercase"
-        htmlFor="grid-password"
-      >
+      <label className="block mb-2 text-xs font-bold text-gray-700 uppercase" htmlFor="grid-password">
         {label}&nbsp;
         {required && <span className="ml-2 text-sm text-red-400">&#42;</span>}
       </label>
@@ -98,12 +85,9 @@ export const AsyncSelectField = ({
         placeholder={placeholder}
         name={name}
         control={control}
-        defaultValue=""
+        defaultValue={defaultValue}
         onInputChange={(query) => {
-          if (fetchOptions)
-            fetchOptions({ query }).then((options) =>
-              setSelectOptions(options)
-            );
+          if (fetchOptions) fetchOptions({ query }).then((options) => setSelectOptions(options));
         }}
         options={selectOptions}
         classNamePrefix="react-select"

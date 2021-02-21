@@ -54,3 +54,12 @@ export const QUOTE_UPDATE_ONE_MUTATION = gql`
     }
   }
 `;
+
+export const QUOTE_CREATE_MANY_MUTATION = gql`
+  mutation quoteCreateMany($records: [CreateManyQuoteInput!]!) {
+    quoteCreateMany(records: $records) {
+      recordIds
+      createCount
+    }
+  }
+`;

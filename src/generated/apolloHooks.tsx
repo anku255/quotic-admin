@@ -46,6 +46,8 @@ export type Query = {
   trendingShows: Array<Maybe<Show>>;
   getShowDataFromIMDB?: Maybe<ShowData>;
   getCharactersFromIMDB?: Maybe<Array<Maybe<ImdbCharacter>>>;
+  getEpisodesFromWikiQuotes: Scalars['String'];
+  getQuotesFromWikiQuotes?: Maybe<Array<Maybe<WikiQuote>>>;
 };
 
 
@@ -213,6 +215,21 @@ export type QueryGetShowDataFromImdbArgs = {
 export type QueryGetCharactersFromImdbArgs = {
   IMDBShowCode: Scalars['String'];
   type: ShowTypeEnum;
+};
+
+
+export type QueryGetEpisodesFromWikiQuotesArgs = {
+  wikiQuotesUrl: Scalars['String'];
+};
+
+
+export type QueryGetQuotesFromWikiQuotesArgs = {
+  wikiQuotesUrl: Scalars['String'];
+  episodesMap?: Maybe<Scalars['String']>;
+  type: ShowTypeEnum;
+  showId: Scalars['String'];
+  limit: Scalars['Int'];
+  skip: Scalars['Int'];
 };
 
 
@@ -818,6 +835,22 @@ export type ImdbCharacter = {
   bioMarkup?: Maybe<Scalars['String']>;
 };
 
+export type WikiQuote = {
+  __typename?: 'WikiQuote';
+  raw: Scalars['String'];
+  markup: Scalars['String'];
+  characters?: Maybe<Array<Maybe<CharacterValue>>>;
+  mainCharacter?: Maybe<CharacterValue>;
+  season?: Maybe<Scalars['Int']>;
+  episode?: Maybe<Scalars['Int']>;
+};
+
+export type CharacterValue = {
+  __typename?: 'CharacterValue';
+  label?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   /** Create one document with mongoose defaults, setters, hooks and validation */
@@ -1151,8 +1184,8 @@ export type CreateOneQuoteInput = {
   show: Scalars['MongoID'];
   characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   mainCharacter?: Maybe<Scalars['MongoID']>;
-  season: Scalars['Float'];
-  episode: Scalars['Float'];
+  season?: Maybe<Scalars['Float']>;
+  episode?: Maybe<Scalars['Float']>;
   timestamp?: Maybe<Scalars['String']>;
   tags?: Maybe<Array<Maybe<Scalars['String']>>>;
   audio?: Maybe<Scalars['String']>;
@@ -1174,8 +1207,8 @@ export type CreateManyQuoteInput = {
   show: Scalars['MongoID'];
   characters?: Maybe<Array<Maybe<Scalars['MongoID']>>>;
   mainCharacter?: Maybe<Scalars['MongoID']>;
-  season: Scalars['Float'];
-  episode: Scalars['Float'];
+  season?: Maybe<Scalars['Float']>;
+  episode?: Maybe<Scalars['Float']>;
   timestamp?: Maybe<Scalars['String']>;
   tags?: Maybe<Array<Maybe<Scalars['String']>>>;
   audio?: Maybe<Scalars['String']>;
@@ -1736,6 +1769,31 @@ export type CharacterUpdateOneMutation = (
   )> }
 );
 
+export type GetQuotesFromWikiQuotesQueryVariables = Exact<{
+  wikiQuotesUrl: Scalars['String'];
+  episodesMap?: Maybe<Scalars['String']>;
+  showId: Scalars['String'];
+  type: ShowTypeEnum;
+  skip: Scalars['Int'];
+  limit: Scalars['Int'];
+}>;
+
+
+export type GetQuotesFromWikiQuotesQuery = (
+  { __typename?: 'Query' }
+  & { getQuotesFromWikiQuotes?: Maybe<Array<Maybe<(
+    { __typename?: 'WikiQuote' }
+    & Pick<WikiQuote, 'markup' | 'raw' | 'season' | 'episode'>
+    & { characters?: Maybe<Array<Maybe<(
+      { __typename?: 'CharacterValue' }
+      & Pick<CharacterValue, 'label' | 'value'>
+    )>>>, mainCharacter?: Maybe<(
+      { __typename?: 'CharacterValue' }
+      & Pick<CharacterValue, 'label' | 'value'>
+    )> }
+  )>>> }
+);
+
 export type SearchCharactersQueryVariables = Exact<{
   realName?: Maybe<Scalars['String']>;
   characterName?: Maybe<Scalars['String']>;
@@ -1817,6 +1875,19 @@ export type QuoteUpdateOneMutation = (
   & { quoteUpdateOne?: Maybe<(
     { __typename?: 'UpdateOneQuotePayload' }
     & Pick<UpdateOneQuotePayload, 'recordId'>
+  )> }
+);
+
+export type QuoteCreateManyMutationVariables = Exact<{
+  records: Array<CreateManyQuoteInput>;
+}>;
+
+
+export type QuoteCreateManyMutation = (
+  { __typename?: 'Mutation' }
+  & { quoteCreateMany?: Maybe<(
+    { __typename?: 'CreateManyQuotePayload' }
+    & Pick<CreateManyQuotePayload, 'recordIds' | 'createCount'>
   )> }
 );
 
@@ -2084,6 +2155,62 @@ export function useCharacterUpdateOneMutation(baseOptions?: Apollo.MutationHookO
 export type CharacterUpdateOneMutationHookResult = ReturnType<typeof useCharacterUpdateOneMutation>;
 export type CharacterUpdateOneMutationResult = Apollo.MutationResult<CharacterUpdateOneMutation>;
 export type CharacterUpdateOneMutationOptions = Apollo.BaseMutationOptions<CharacterUpdateOneMutation, CharacterUpdateOneMutationVariables>;
+export const GetQuotesFromWikiQuotesDocument = gql`
+    query getQuotesFromWikiQuotes($wikiQuotesUrl: String!, $episodesMap: String, $showId: String!, $type: ShowTypeEnum!, $skip: Int!, $limit: Int!) {
+  getQuotesFromWikiQuotes(
+    wikiQuotesUrl: $wikiQuotesUrl
+    episodesMap: $episodesMap
+    showId: $showId
+    type: $type
+    skip: $skip
+    limit: $limit
+  ) {
+    markup
+    raw
+    season
+    episode
+    characters {
+      label
+      value
+    }
+    mainCharacter {
+      label
+      value
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetQuotesFromWikiQuotesQuery__
+ *
+ * To run a query within a React component, call `useGetQuotesFromWikiQuotesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetQuotesFromWikiQuotesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetQuotesFromWikiQuotesQuery({
+ *   variables: {
+ *      wikiQuotesUrl: // value for 'wikiQuotesUrl'
+ *      episodesMap: // value for 'episodesMap'
+ *      showId: // value for 'showId'
+ *      type: // value for 'type'
+ *      skip: // value for 'skip'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetQuotesFromWikiQuotesQuery(baseOptions: Apollo.QueryHookOptions<GetQuotesFromWikiQuotesQuery, GetQuotesFromWikiQuotesQueryVariables>) {
+        return Apollo.useQuery<GetQuotesFromWikiQuotesQuery, GetQuotesFromWikiQuotesQueryVariables>(GetQuotesFromWikiQuotesDocument, baseOptions);
+      }
+export function useGetQuotesFromWikiQuotesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetQuotesFromWikiQuotesQuery, GetQuotesFromWikiQuotesQueryVariables>) {
+          return Apollo.useLazyQuery<GetQuotesFromWikiQuotesQuery, GetQuotesFromWikiQuotesQueryVariables>(GetQuotesFromWikiQuotesDocument, baseOptions);
+        }
+export type GetQuotesFromWikiQuotesQueryHookResult = ReturnType<typeof useGetQuotesFromWikiQuotesQuery>;
+export type GetQuotesFromWikiQuotesLazyQueryHookResult = ReturnType<typeof useGetQuotesFromWikiQuotesLazyQuery>;
+export type GetQuotesFromWikiQuotesQueryResult = Apollo.QueryResult<GetQuotesFromWikiQuotesQuery, GetQuotesFromWikiQuotesQueryVariables>;
 export const SearchCharactersDocument = gql`
     query searchCharacters($realName: String, $characterName: String, $limit: Int) {
   searchCharacters(
@@ -2280,6 +2407,39 @@ export function useQuoteUpdateOneMutation(baseOptions?: Apollo.MutationHookOptio
 export type QuoteUpdateOneMutationHookResult = ReturnType<typeof useQuoteUpdateOneMutation>;
 export type QuoteUpdateOneMutationResult = Apollo.MutationResult<QuoteUpdateOneMutation>;
 export type QuoteUpdateOneMutationOptions = Apollo.BaseMutationOptions<QuoteUpdateOneMutation, QuoteUpdateOneMutationVariables>;
+export const QuoteCreateManyDocument = gql`
+    mutation quoteCreateMany($records: [CreateManyQuoteInput!]!) {
+  quoteCreateMany(records: $records) {
+    recordIds
+    createCount
+  }
+}
+    `;
+export type QuoteCreateManyMutationFn = Apollo.MutationFunction<QuoteCreateManyMutation, QuoteCreateManyMutationVariables>;
+
+/**
+ * __useQuoteCreateManyMutation__
+ *
+ * To run a mutation, you first call `useQuoteCreateManyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useQuoteCreateManyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [quoteCreateManyMutation, { data, loading, error }] = useQuoteCreateManyMutation({
+ *   variables: {
+ *      records: // value for 'records'
+ *   },
+ * });
+ */
+export function useQuoteCreateManyMutation(baseOptions?: Apollo.MutationHookOptions<QuoteCreateManyMutation, QuoteCreateManyMutationVariables>) {
+        return Apollo.useMutation<QuoteCreateManyMutation, QuoteCreateManyMutationVariables>(QuoteCreateManyDocument, baseOptions);
+      }
+export type QuoteCreateManyMutationHookResult = ReturnType<typeof useQuoteCreateManyMutation>;
+export type QuoteCreateManyMutationResult = Apollo.MutationResult<QuoteCreateManyMutation>;
+export type QuoteCreateManyMutationOptions = Apollo.BaseMutationOptions<QuoteCreateManyMutation, QuoteCreateManyMutationVariables>;
 export const SearchShowsDocument = gql`
     query searchShows($name: String, $limit: Int) {
   searchShows(name: $name, limit: $limit) {
